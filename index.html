@@ -2,30 +2,83 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Globo 3D F1</title>
+<title>F1 Globe Final</title>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
-body{margin:0;overflow:hidden;background:#020617;font-family:sans-serif}
+body{
+margin:0;
+overflow:hidden;
+background:#020617;
+font-family:sans-serif;
+}
 
+/* -------- TITLE -------- */
 #title{
 position:absolute;
 top:16px;
 left:16px;
 background:white;
-padding:10px;
+padding:10px 14px;
 border-radius:8px;
+font-size:14px;
 }
 
+/* -------- TOOLTIP -------- */
 #tooltip{
 position:absolute;
 display:none;
 background:white;
-padding:6px;
+padding:6px 8px;
 border-radius:6px;
 font-size:12px;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* -------- LEGEND -------- */
+#legend{
+position:absolute;
+top:70px;
+left:16px;
+
+background:rgba(255,255,255,0.95);
+backdrop-filter:blur(6px);
+
+padding:14px 16px;
+border-radius:12px;
+
+box-shadow:0 8px 24px rgba(0,0,0,0.25);
+
+font-size:12px;
+color:#0f172a;
+
+min-width:180px;
+transition: all 0.3s ease;
+}
+
+#legend:hover{
+transform: scale(1.02);
+}
+
+#legend h3{
+font-size:13px;
+margin-bottom:10px;
+color:#020617;
+}
+
+.legend-item{
+display:flex;
+align-items:center;
+gap:8px;
+margin-bottom:6px;
+}
+
+.legend-color{
+width:12px;
+height:12px;
+border-radius:3px;
 }
 </style>
 </head>
@@ -34,22 +87,17 @@ font-size:12px;
 
 <div id="title">F1 Globe 🌍🏁</div>
 <div id="tooltip"></div>
+<div id="legend">
+  <h3>Corridas F1</h3>
+</div>
 
 <script>
 
-// --------------------
-// CONFIG
-// --------------------
-
+// ---------------- CONFIG ----------------
 const RADIUS = 6;
-let rotX = 0.3;
-let rotY = 0.5;
-let zoom = 18;
+let rotX = 0.3, rotY = 0.5, zoom = 18;
 
-// --------------------
-// DADOS
-// --------------------
-
+// ---------------- DADOS ----------------
 const races = [
 { name:"Interlagos", lat:-23.7, lng:-46.7, valor:71, cor:"#22c55e"},
 { name:"Monaco", lat:43.7, lng:7.4, valor:78, cor:"#ef4444"},
@@ -58,31 +106,36 @@ const races = [
 { name:"Austin", lat:30.1, lng:-97.6, valor:56, cor:"#06b6d4"}
 ];
 
-// --------------------
-// LAT/LNG → ESFERA
-// --------------------
+// ---------------- LEGENDA (D3) ----------------
+const legend = d3.select("#legend");
 
+legend.selectAll(".legend-item")
+.data(races)
+.enter()
+.append("div")
+.attr("class","legend-item")
+.html(d=>`
+  <div class="legend-color" style="background:${d.cor}"></div>
+  <div>${d.name}</div>
+`);
+
+// ---------------- CONVERSÃO ----------------
 function latLngToSphere(lat, lng, radius){
-
-const phi = (90 - lat) * (Math.PI/180);
-const theta = (lng + 180) * (Math.PI/180);
+const phi = (90 - lat) * Math.PI/180;
+const theta = (lng + 180) * Math.PI/180;
 
 return {
 x: -(radius * Math.sin(phi) * Math.cos(theta)),
 y: radius * Math.cos(phi),
 z: radius * Math.sin(phi) * Math.sin(theta)
 };
-
 }
 
-// --------------------
-// THREE
-// --------------------
-
+// ---------------- THREE ----------------
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#020617");
 
-const camera = new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,100);
+const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 100);
 
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(innerWidth,innerHeight);
@@ -90,15 +143,11 @@ document.body.appendChild(renderer.domElement);
 
 // luz
 scene.add(new THREE.AmbientLight(0xffffff,0.8));
-
 const light = new THREE.DirectionalLight(0xffffff,1.5);
 light.position.set(10,10,10);
 scene.add(light);
 
-// --------------------
-// GLOBO
-// --------------------
-
+// ---------------- GLOBO ----------------
 const texture = new THREE.TextureLoader().load(
 "https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg"
 );
@@ -110,151 +159,114 @@ new THREE.MeshStandardMaterial({map:texture})
 
 scene.add(globe);
 
-// --------------------
-// COLUNAS
-// --------------------
-
-const maxR = d3.max(races,d=>d.valor);
+// ---------------- COLUNAS ----------------
+const maxR = d3.max(races, d=>d.valor);
 const meshes = [];
 
 races.forEach((r,i)=>{
 
-const pos = latLngToSphere(r.lat,r.lng,RADIUS);
-
+const pos = latLngToSphere(r.lat, r.lng, RADIUS);
 const hFinal = (r.valor/maxR)*2;
 
-const geometry = new THREE.CylinderGeometry(0.1,0.1,1,8);
+const mesh = new THREE.Mesh(
+new THREE.CylinderGeometry(0.1,0.1,1,8),
+new THREE.MeshStandardMaterial({color:r.cor})
+);
 
-const material = new THREE.MeshStandardMaterial({color:r.cor});
+const normal = new THREE.Vector3(pos.x,pos.y,pos.z).normalize();
 
-const mesh = new THREE.Mesh(geometry,material);
-
-// posição
 mesh.position.set(pos.x,pos.y,pos.z);
 
-// apontar para fora do globo
-mesh.lookAt(10,0,0);
-
-// deslocar pra fora
-mesh.translateY(1);
+mesh.quaternion.setFromUnitVectors(
+new THREE.Vector3(0,1,0),
+normal
+);
 
 scene.add(mesh);
 meshes.push(mesh);
 
 // animação D3
-d3.select({h:0})
+d3.select({t:0})
 .transition()
 .duration(1200)
 .delay(i*200)
-.tween("grow",function(){
+.tween("grow", function(){
 return function(t){
 
-mesh.scale.y = hFinal * t;
+const h = hFinal * t;
 
-}
+mesh.scale.y = Math.max(0.001, h);
+
+mesh.position.set(pos.x,pos.y,pos.z);
+mesh.position.add(normal.clone().multiplyScalar(h/2));
+
+};
 });
 
 });
 
-// --------------------
-// TOOLTIP
-// --------------------
-
+// ---------------- TOOLTIP ----------------
 const tooltip = document.getElementById("tooltip");
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
 window.addEventListener("mousemove",(e)=>{
-
 mouse.x = (e.clientX/innerWidth)*2-1;
 mouse.y = -(e.clientY/innerHeight)*2+1;
 
 raycaster.setFromCamera(mouse,camera);
-
 const hits = raycaster.intersectObjects(meshes);
 
 if(hits.length){
-
 const d = races[meshes.indexOf(hits[0].object)];
-
 tooltip.style.display="block";
-tooltip.style.left = e.clientX+"px";
+tooltip.style.left = e.clientX+10+"px";
 tooltip.style.top = e.clientY+"px";
 tooltip.innerHTML = `<b>${d.name}</b><br>${d.valor} voltas`;
-
 }else{
 tooltip.style.display="none";
 }
-
 });
 
-// --------------------
-// CAMERA
-// --------------------
-
+// ---------------- CAMERA ----------------
 function updateCam(){
-
 camera.position.x = Math.sin(rotY)*Math.cos(rotX)*zoom;
 camera.position.y = Math.sin(rotX)*zoom;
 camera.position.z = Math.cos(rotY)*Math.cos(rotX)*zoom;
-
 camera.lookAt(0,0,0);
-
 }
-
 updateCam();
 
-// --------------------
-// D3 DRAG
-// --------------------
-
+// ---------------- D3 DRAG ----------------
 d3.select(renderer.domElement).call(
 d3.drag().on("drag",(e)=>{
-
 rotY += e.dx * 0.005;
 rotX += e.dy * 0.005;
-
 updateCam();
-
 })
 );
 
-// --------------------
-// D3 ZOOM
-// --------------------
-
+// ---------------- D3 ZOOM ----------------
 d3.select(renderer.domElement).call(
 d3.zoom().scaleExtent([10,40]).on("zoom",(e)=>{
-
 zoom = e.transform.k;
 updateCam();
-
 })
 );
 
-// --------------------
-// LOOP (globo girando)
-// --------------------
-
+// ---------------- LOOP ----------------
 function animate(){
-
 requestAnimationFrame(animate);
-
-globe.rotation.y += 0.0015; // 🌍 rotação automática
-
+globe.rotation.y += 0.0015;
 renderer.render(scene,camera);
-
 }
-
 animate();
 
 // resize
 window.addEventListener("resize",()=>{
-
 renderer.setSize(innerWidth,innerHeight);
 camera.aspect = innerWidth/innerHeight;
 camera.updateProjectionMatrix();
-
 });
 
 </script>
