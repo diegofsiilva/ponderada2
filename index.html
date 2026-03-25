@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>F1 Globe Final</title>
+<title>F1 na globe</title>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -15,7 +15,6 @@ background:#020617;
 font-family:sans-serif;
 }
 
-/* -------- TITLE -------- */
 #title{
 position:absolute;
 top:16px;
@@ -26,7 +25,6 @@ border-radius:8px;
 font-size:14px;
 }
 
-/* -------- TOOLTIP -------- */
 #tooltip{
 position:absolute;
 display:none;
@@ -37,7 +35,6 @@ font-size:12px;
 box-shadow:0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* -------- LEGEND -------- */
 #legend{
 position:absolute;
 top:70px;
@@ -85,7 +82,7 @@ border-radius:3px;
 
 <body>
 
-<div id="title">F1 Globe 🌍🏁</div>
+<div id="title">F1 na globe</div>
 <div id="tooltip"></div>
 <div id="legend">
   <h3>Corridas F1</h3>
@@ -93,20 +90,17 @@ border-radius:3px;
 
 <script>
 
-// ---------------- CONFIG ----------------
 const RADIUS = 6;
 let rotX = 0.3, rotY = 0.5, zoom = 18;
 
-// ---------------- DADOS ----------------
 const races = [
-{ name:"Interlagos", lat:-23.7, lng:-46.7, valor:71, cor:"#22c55e"},
-{ name:"Monaco", lat:43.7, lng:7.4, valor:78, cor:"#ef4444"},
-{ name:"Silverstone", lat:52.0, lng:-1.0, valor:52, cor:"#3b82f6"},
-{ name:"Suzuka", lat:34.8, lng:136.5, valor:53, cor:"#a855f7"},
-{ name:"Austin", lat:30.1, lng:-97.6, valor:56, cor:"#06b6d4"}
+{ name:"Interlagos - 71 voltas", lat:-23.7, lng:-46.7, valor:71, cor:"#22c55e"},
+{ name:"Monaco - 78 voltas", lat:43.7, lng:7.4, valor:78, cor:"#ef4444"},
+{ name:"Silverstone - 52 voltas", lat:52.0, lng:-1.0, valor:52, cor:"#3b82f6"},
+{ name:"Suzuka - 53 voltas", lat:34.8, lng:136.5, valor:53, cor:"#a855f7"},
+{ name:"Austin - 56 voltas", lat:30.1, lng:-97.6, valor:56, cor:"#06b6d4"}
 ];
 
-// ---------------- LEGENDA (D3) ----------------
 const legend = d3.select("#legend");
 
 legend.selectAll(".legend-item")
@@ -119,7 +113,6 @@ legend.selectAll(".legend-item")
   <div>${d.name}</div>
 `);
 
-// ---------------- CONVERSÃO ----------------
 function latLngToSphere(lat, lng, radius){
 const phi = (90 - lat) * Math.PI/180;
 const theta = (lng + 180) * Math.PI/180;
@@ -131,7 +124,6 @@ z: radius * Math.sin(phi) * Math.sin(theta)
 };
 }
 
-// ---------------- THREE ----------------
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#020617");
 
@@ -141,13 +133,11 @@ const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(innerWidth,innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// luz
 scene.add(new THREE.AmbientLight(0xffffff,0.8));
 const light = new THREE.DirectionalLight(0xffffff,1.5);
 light.position.set(10,10,10);
 scene.add(light);
 
-// ---------------- GLOBO ----------------
 const texture = new THREE.TextureLoader().load(
 "https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg"
 );
@@ -159,7 +149,6 @@ new THREE.MeshStandardMaterial({map:texture})
 
 scene.add(globe);
 
-// ---------------- COLUNAS ----------------
 const maxR = d3.max(races, d=>d.valor);
 const meshes = [];
 
@@ -185,7 +174,6 @@ normal
 globe.add(mesh);
 meshes.push(mesh);
 
-// animação D3
 d3.select({t:0})
 .transition()
 .duration(1200)
@@ -205,7 +193,6 @@ mesh.position.add(normal.clone().multiplyScalar(h/2));
 
 });
 
-// ---------------- TOOLTIP ----------------
 const tooltip = document.getElementById("tooltip");
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -228,7 +215,6 @@ tooltip.style.display="none";
 }
 });
 
-// ---------------- CAMERA ----------------
 function updateCam(){
 camera.position.x = Math.sin(rotY)*Math.cos(rotX)*zoom;
 camera.position.y = Math.sin(rotX)*zoom;
@@ -237,7 +223,6 @@ camera.lookAt(0,0,0);
 }
 updateCam();
 
-// ---------------- D3 DRAG ----------------
 d3.select(renderer.domElement).call(
 d3.drag().on("drag",(e)=>{
 rotY += e.dx * 0.005;
@@ -246,7 +231,6 @@ updateCam();
 })
 );
 
-// ---------------- D3 ZOOM ----------------
 d3.select(renderer.domElement).call(
 d3.zoom().scaleExtent([10,40]).on("zoom",(e)=>{
 zoom = e.transform.k;
@@ -254,7 +238,6 @@ updateCam();
 })
 );
 
-// ---------------- LOOP ----------------
 function animate(){
 requestAnimationFrame(animate);
 globe.rotation.y += 0.0015;
@@ -262,7 +245,6 @@ renderer.render(scene,camera);
 }
 animate();
 
-// resize
 window.addEventListener("resize",()=>{
 renderer.setSize(innerWidth,innerHeight);
 camera.aspect = innerWidth/innerHeight;
