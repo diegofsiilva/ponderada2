@@ -6,7 +6,7 @@
 
 ## Relevância
 
-O **F1 Globe Pins** exibe os circuitos de Fórmula 1 sobre um globo terrestre tridimensional e rotativo, permitindo visualizar onde cada corrida acontece no mundo de forma geográfica e interativa. Cada circuito é marcado por um pin com altura proporcional a um valor associado, como número de voltas, tornando possível comparar os eventos pela localização e pela grandeza do dado representado.
+O **F1 Globe Pins** exibe os circuitos de Fórmula 1 sobre um globo terrestre tridimensional e rotativo, permitindo visualizar onde cada corrida acontece no mundo de forma geográfica e interativa. Cada circuito é marcado por um pin com altura proporcional ao número de voltas do circuito.
 
 Essa abordagem contribui para:
 
@@ -39,7 +39,7 @@ O globo também gira automaticamente de forma contínua. A legenda lateral ident
 
 ## Como ler o globo
 
-- **Altura da haste:** proporcional ao valor do circuito — haste mais longa indica valor maior
+- **Altura da haste:** proporcional ao número de voltas do circuito, haste mais longa indica valor maior
 - **Esfera no topo:** marca visual de cada pin
 - **Cor:** identificador exclusivo por circuito, correspondente à legenda
 
