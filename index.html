@@ -65,6 +65,37 @@ width:12px;
 height:12px;
 border-radius:3px;
 }
+
+/* ── Hint box ── */
+#hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: rgba(255,255,255,0.10);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 12px;
+
+  padding: 12px 20px;
+  display: flex;
+  gap: 24px;
+
+  font-size: 12px;
+  color: rgba(255,255,255,0.80);
+}
+
+.hint-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hint-icon {
+  font-size: 16px;
+  line-height: 1;
+}
 </style>
 </head>
 
@@ -74,6 +105,21 @@ border-radius:3px;
 <div id="tooltip"></div>
 <div id="legend"><h3>Corridas F1</h3></div>
 
+<div id="hint">
+  <div class="hint-item">
+    <span class="hint-icon">🖱️</span>
+    <span>Arraste para girar</span>
+  </div>
+  <div class="hint-item">
+    <span class="hint-icon">🔍</span>
+    <span>Scroll para zoom</span>
+  </div>
+  <div class="hint-item">
+    <span class="hint-icon">📍</span>
+    <span>Passe o mouse sobre um pin para ver detalhes</span>
+  </div>
+</div>
+
 <script>
 
 // ---------------- CONFIG ----------------
@@ -82,11 +128,11 @@ let rotX = 0.3, rotY = 0.5, zoom = 18;
 
 // ---------------- DADOS ----------------
 const races = [
-{ name:"Interlagos", lat:-23.7, lng:-46.7, valor:71, cor:"#22c55e"},
-{ name:"Monaco", lat:43.7, lng:7.4, valor:78, cor:"#ef4444"},
-{ name:"Silverstone", lat:52.0, lng:-1.0, valor:52, cor:"#3b82f6"},
-{ name:"Suzuka", lat:34.8, lng:136.5, valor:53, cor:"#a855f7"},
-{ name:"Austin", lat:30.1, lng:-97.6, valor:56, cor:"#06b6d4"}
+{ name:"Interlagos - 71 voltas", lat:-23.7, lng:-46.7, valor:71, cor:"#22c55e"},
+{ name:"Monaco - 78 voltas", lat:43.7, lng:7.4, valor:78, cor:"#ef4444"},
+{ name:"Silverstone - 52 voltas", lat:52.0, lng:-1.0, valor:52, cor:"#3b82f6"},
+{ name:"Suzuka - 53 voltas", lat:34.8, lng:136.5, valor:53, cor:"#a855f7"},
+{ name:"Austin - 56 voltas", lat:30.1, lng:-97.6, valor:56, cor:"#06b6d4"}
 ];
 
 // ---------------- LEGENDA ----------------
