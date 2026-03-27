@@ -1,4 +1,4 @@
-# Globo 3D Interativo — F1 Globe Pins
+# Globo 3D Interativo - F1 Globe Pins
 
 **Responsável:** Diego Figueiredo Silva 
 
