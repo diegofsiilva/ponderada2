@@ -45,7 +45,7 @@ O globo também gira automaticamente de forma contínua. A legenda lateral ident
 
 ---
 
-## Explicação Técnica
+## Explicação Técnica e principais diferenças
 
 Estou utilizando as mesmas bibliotecas do projeto anterior — **D3.js** e **Three.js** — com três diferenças principais:
 
