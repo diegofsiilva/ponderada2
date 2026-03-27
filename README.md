@@ -65,4 +65,4 @@ A animação de entrada dos pins (crescimento do zero) e os controles de câmera
 
 ## Imagem
 
-<img src="foto.png">
+<img src="globo.png">
